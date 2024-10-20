@@ -16,7 +16,7 @@ services:
       - db
       - redis
     command: >
-      bash -c "flask db upgrade && flask run --host=0.0.0.0"
+      bash -c "flask db upgrade && python app.py"
 
   celery-worker:
     build:

@@ -1,18 +1,24 @@
 from flask import Blueprint, request, jsonify
 from models import User, Alert
-from extensions import db,socketio,cache
+from extensions import db,socketio,cache,jwt
 from utils import get_stock_price,send_stock_data
 from yahoo_fin import stock_info
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
-
+import redis
+from config import Config
 
 stock_blueprint = Blueprint('stock', __name__)
 auth_blueprint = Blueprint('auth', __name__)
 scheduler = BackgroundScheduler()
 
+jwt_redis_blocklist = redis.StrictRedis(
+    host=Config.JWT_BLOCKLIST_SERVER, port=6379, db=2, decode_responses=True
+)
+
+ACCESS_EXPIRY = timedelta(days=1)
 
 
 @auth_blueprint.route('/register', methods=['POST'])
@@ -28,7 +34,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
     user = User.query.filter_by(email=email).first()
-    access_token = create_access_token(identity=user.id,expires_delta=timedelta(days=1))
+    access_token = create_access_token(identity=user.id,expires_delta=ACCESS_EXPIRY)
     return jsonify(access_token=access_token,id=user.id), 200
     
 
@@ -43,8 +49,26 @@ def login():
     if not user or not check_password_hash(user.password,password):
         return jsonify({"msg": "Invalid username or password"}), 401
 
-    access_token = create_access_token(identity=user.id,expires_delta=timedelta(days=1))
+    access_token = create_access_token(identity=user.id,expires_delta=ACCESS_EXPIRY)
     return jsonify(access_token=access_token,id=user.id), 200
+
+@jwt.token_in_blocklist_loader
+def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
+    jti = jwt_payload["jti"]
+    token_in_redis = jwt_redis_blocklist.get(jti)
+    return token_in_redis is not None
+
+
+
+@auth_blueprint.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    jti = get_jwt()["jti"]
+    jwt_redis_blocklist.set(jti, "", ex=ACCESS_EXPIRY)
+    return jsonify(msg="Access token revoked")
+
+    
+
 
 @stock_blueprint.route('/alerts', methods=['POST','GET'])
 @jwt_required()
@@ -95,7 +119,7 @@ def enable_disable(alert_id):
     alert.enabled = enabled
     db.session.commit()
     
-    return jsonify({"message": "Alert deleted successfully"}), 200
+    return jsonify({"message": "Alert updated successfully"}), 200
 
 
 

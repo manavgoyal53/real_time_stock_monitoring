@@ -8,6 +8,8 @@ import Home from './components/Home';
 import "./App.css"
 import NavBar from './components/NavBar';
 import AlertsList from './components/AlertsList';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 class App extends Component {
   constructor(props) {
@@ -17,21 +19,15 @@ class App extends Component {
     };
   }
 
-  setAuth = (isAuthenticated) => {
-    this.setState({ isAuthenticated });
-  };
-
-  handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location = '/' // Redirect to login
-  };
+  
 
   render() {
     const { isAuthenticated } = this.state;
 
     return (
       <Router>
-        <NavBar onLogout={this.handleLogout} isAuthenticated={this.state.isAuthenticated}/>
+        <ToastContainer/>
+        <NavBar isAuthenticated={this.state.isAuthenticated}/>
         <div className="app-container">
           {/* Show Login by default */}
           <Routes>
@@ -40,7 +36,7 @@ class App extends Component {
               path="/login"
               element={
                 <>
-                  <Login setAuth={this.setAuth} />
+                  <Login />
                   <p className="signup-text">
                     Don't have an account? <Link to="/register">Sign up.</Link>
                   </p>
@@ -70,7 +66,7 @@ class App extends Component {
               path="/"
               element={
                 <>
-                  <Login setAuth={this.setAuth} />
+                  <Login />
                   <p className="signup-text">
                     Don't have an account? <Link to="/register">Sign up.</Link>
                   </p>

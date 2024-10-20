@@ -18,15 +18,11 @@ class Register extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = this.state;
-
-    try {
-      await register({ email, password });
+    const res = await register({ email, password });
+    if (res){
       window.location = "/"
-      // Handle successful registration, e.g., redirect or show a message
-    } catch (err) {
-      console.error("Registration error:", err);
-      // Handle the error appropriately, e.g., show a message to the user
     }
+      
   };
 
   render() {

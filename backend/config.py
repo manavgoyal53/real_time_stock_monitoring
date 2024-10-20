@@ -16,6 +16,7 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY',"your_jwt_secret_key")
     CACHE_REDIS_URL = os.getenv('CACHE_REDIS_URL',"redis://localhost:6379/0")
     result_backend = os.getenv('result_backend',"redis://localhost:6379/1")
+    JWT_BLOCKLIST_SERVER = os.getenv('JWT_BLOCKLIST_SERVER',"localhost")
 
     
     

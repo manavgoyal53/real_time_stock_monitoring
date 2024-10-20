@@ -6,6 +6,8 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 import 'chartjs-adapter-moment';
 import './LiveStockChart.css';
+import { toast } from 'react-toastify';
+
 
 const withRouter = WrappedComponent => props => {
   const params = useParams();
@@ -26,6 +28,7 @@ class LiveStockChart extends Component {
       showModal: false, 
       alertType: 'above',
       alertPrice: '',
+      socket : io('http://localhost:5000/',{autoConnect:false})
     };
   }
 
@@ -38,7 +41,6 @@ class LiveStockChart extends Component {
 
     const stock_history = response.data.price_history;
     const market_open = response.data.market_open;
-    this.socket = io('http://localhost:5000/');
 
 
     this.setState((prevState) => ({
@@ -46,10 +48,11 @@ class LiveStockChart extends Component {
       timestamps: [...prevState.timestamps, ...Object.keys(stock_history)],
     }));
 
-    // Only subscribe if market is open
+    // Only connect and subscribe if market is open
     if (market_open) {
+      this.state.socket.connect();
       // Listen for stock data updates
-      this.socket.on('stock_update', (data) => {
+      this.state.socket.on('stock_update', (data) => {
         const { price, timestamp } = data;
 
         // Append new data to the arrays
@@ -60,18 +63,13 @@ class LiveStockChart extends Component {
       });
 
       // Subscribe to stock symbol when component mounts
-      this.socket.emit('subscribe_to_stock', { stock_symbol: symbol, start_timestamp: this.state.timestamps.at(-1) });
+      this.state.socket.emit('subscribe_to_stock', { stock_symbol: symbol, start_timestamp: this.state.timestamps.at(-1) });
     }
   }
 
-  
-
   componentWillUnmount() {
-    if (this.props.market_open){
-      this.socket.off('stock_update');
-      this.socket.disconnect();
-    }
-    
+      this.state.socket.off('stock_update');
+      this.state.socket.disconnect();
   }
 
   toggleModal = () => {
@@ -89,8 +87,9 @@ class LiveStockChart extends Component {
     }
     const response = await axios.post('http://localhost:5000/api/alerts',data ,{
       headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` },
-    });
-    console.log(response)
+    }).then((res)=>{
+      toast.success("Alert created successfully",{"position":"top-right"})
+    })
 
 
     this.toggleModal(); 

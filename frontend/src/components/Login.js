@@ -18,15 +18,9 @@ class Login extends React.Component {
   handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = this.state;
-
-    try {
-      const res = await login({ email, password });
-      this.props.setAuth(true);
+    const res = await login({ email, password });
+    if(res){
       window.location = "/"
-      // Handle successful login, e.g., redirect or show a message
-    } catch (err) {
-      console.error("Login error:", err);
-      // Handle the error appropriately, e.g., show a message to the user
     }
   };
 

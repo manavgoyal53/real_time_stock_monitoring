@@ -10,7 +10,7 @@ class User(db.Model):
 
 class Alert(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    stock_symbol = db.Column(db.String(10), nullable=False)
+    stock_symbol = db.Column(db.String(30), nullable=False)
     price_threshold = db.Column(db.Float, nullable=False)
     alert_type = db.Column(db.String(10), nullable=False)  # "above" or "below"
     enabled = db.Column(db.Boolean, default=True)
