@@ -11,6 +11,8 @@
   .nav-left h3 {
     margin: 0;
     font-family: 'Arial', sans-serif;
+    background-color: transparent;
+    cursor: pointer;
   }
   
   .nav-right button {

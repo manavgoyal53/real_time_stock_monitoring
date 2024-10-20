@@ -18,6 +18,7 @@ def get_stock_price(symbol):
         if not cached_data:
             diff = weekday - 5
             data = stock.history(interval="1m",start=date-datetime.timedelta(days=diff))
+            data = json.loads(data["Close"].to_json(date_format="iso"))
             cache.set(f"stock_{symbol}",data)
             return data, False
         else:
@@ -43,6 +44,7 @@ def get_stock_price(symbol):
             return new_data, True
         else:
             data = stock.history(interval="1m",period="1d")
+            data = json.loads(data["Close"].to_json(date_format="iso"))
             cache.set(f"stock_{symbol}",data)
             return data, True
             

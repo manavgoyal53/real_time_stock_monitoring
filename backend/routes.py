@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from models import User, Alert
-from extensions import db,socketio
+from extensions import db,socketio,cache
 from utils import get_stock_price,send_stock_data
 from yahoo_fin import stock_info
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -35,7 +35,6 @@ def register():
 @auth_blueprint.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    print(data)
     email = data.get('email')
     password = data.get('password')
 
@@ -121,7 +120,12 @@ def homepage():
     Fetches the stock symbols to be displayed on the homepage. Currerntly using
     two indices but we can add as many as available on a requirement basis
     """
-    nifty50_tickers = stock_info.tickers_nifty50()
+    cached_data = cache.get("stocks_list")
+    if cached_data:
+        nifty50_tickers =  cached_data
+    else:
+        nifty50_tickers = stock_info.tickers_nifty50()
+        cache.set("stocks_list",nifty50_tickers)
     return jsonify({"nifty50_tickers": nifty50_tickers}), 200
 
 

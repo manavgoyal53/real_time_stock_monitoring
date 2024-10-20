@@ -10,12 +10,15 @@ class NavBar extends Component {
     handleViewAlerts = () => {
         window.location = "/alerts"
     };
+    handleViewHome = () => {
+      window.location = "/"
+  };
 
   render() {
     return (
       <nav className="nav-bar">
         <div className="nav-left">
-          <h3>Stock Monitoring</h3>
+            <h3 onClick={this.handleViewHome}>Stock Monitoring</h3>
         </div>
         {this.props.isAuthenticated && (
             <div className="nav-right">
