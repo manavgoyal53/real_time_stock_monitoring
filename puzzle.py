@@ -43,7 +43,8 @@ class LoopPuzzleSolver:
         # Check all numbers in the grid
         for i in range(self.N):
             for j in range(self.N):
-                if not self.check_number_constraints(i, j):
+                # Skip empty cells (None)
+                if self.grid[i][j] is not None and not self.check_number_constraints(i, j):
                     return False
         return True
 
@@ -67,16 +68,14 @@ class LoopPuzzleSolver:
             print("No solution found")
 
 
-# Example grid
+# Example grid (with empty cells represented as None)
 grid = [
-    [3, 0, 2, 0, 3],
-    [2, 1, 1, 0, 2],
-    [3, 0, 2, 3, 2],
-    [3, 1, 1, 2, 2],
-    [2, 2, 2, 2, 1]
+    [3, None, 2, None, 3],
+    [2, 1, 1, None, 2],
+    [3, None, 2, 3, 2],
+    [3, 1, 1, 2, None],
+    [None, 2, 2, 2, 1]
 ]
 
 solver = LoopPuzzleSolver(grid)
 solver.solve()
-
-
