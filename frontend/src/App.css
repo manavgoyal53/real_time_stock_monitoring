@@ -1,0 +1,13 @@
+.signup-text {
+  text-align: center; /* Center the signup text */
+  margin-top: 10px; /* Space above the text */
+  color: #007bff; /* Link color */
+}
+
+.signup-text a {
+  text-decoration: none; /* Remove underline from links */
+}
+
+.signup-text a:hover {
+  text-decoration: underline; /* Underline on hover */
+}

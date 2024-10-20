@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  flask-app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: flask-app
+    environment:
+      - FLASK_ENV=development
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - db
+      - redis
+    command: >
+      bash -c "flask db upgrade && flask run --host=0.0.0.0"
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.worker
+    container_name: celery-worker
+    depends_on:
+      - flask-app
+      - redis
+    volumes:
+      - ./backend:/app
+
+
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  db:
+    image: postgres:13-alpine
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stock_monitoring
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - flask-app
+    volumes:
+      - ./frontend:/app
+    command: npm start
+
+volumes:
+  postgres_data:

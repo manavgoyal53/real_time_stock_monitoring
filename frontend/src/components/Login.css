@@ -1,0 +1,48 @@
+.login-container {
+    max-width: 400px; /* Maximum width for the login form */
+    margin: 50px auto; /* Center the form vertically and horizontally */
+    padding: 20px; /* Inner padding for the container */
+    background-color: #f9f9f9; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  }
+  
+  .login-title {
+    text-align: center; /* Center the title text */
+    margin-bottom: 20px; /* Space below the title */
+    color: #333; /* Dark gray for the title text */
+  }
+  
+  .login-form {
+    display: flex; /* Flexbox for layout */
+    flex-direction: column; /* Stack the inputs vertically */
+  }
+  
+  .login-input {
+    padding: 10px; /* Inner padding for inputs */
+    margin-bottom: 15px; /* Space below each input */
+    border: 1px solid #ccc; /* Light border for inputs */
+    border-radius: 4px; /* Rounded corners for inputs */
+    font-size: 16px; /* Font size for inputs */
+  }
+  
+  .login-input:focus {
+    border-color: #007bff; /* Change border color on focus */
+    outline: none; /* Remove outline */
+  }
+  
+  .login-button {
+    padding: 10px; /* Inner padding for the button */
+    background-color: #007bff; /* Blue background color */
+    color: white; /* White text color */
+    border: none; /* Remove default border */
+    border-radius: 4px; /* Rounded corners for the button */
+    font-size: 16px; /* Font size for the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth transition for background color */
+  }
+  
+  .login-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+  

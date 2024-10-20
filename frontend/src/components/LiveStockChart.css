@@ -1,0 +1,123 @@
+.chart-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chart-header {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 24px;
+    color: #333;
+  }
+  
+  .chart-wrapper {
+    margin-bottom: 30px;
+  }
+  
+  .alert-button {
+    display: block;
+    margin: 0 auto 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .alert-button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Modal styles */
+  .modal {
+    display: block; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto; /* Lower margin for better positioning */
+    padding: 30px; /* Increased padding for more spacing inside */
+    border: 1px solid #888;
+    width: 400px;
+    max-width: 90%; /* Makes the modal responsive */
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Modal form layout */
+  .modal-content h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .modal-content form label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-family: Arial, sans-serif;
+    color: #333;
+  }
+  
+  .modal-content form select,
+  .modal-content form input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px; /* More space between input elements */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  
+  /* Buttons inside modal */
+  .save-button,
+  .cancel-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .save-button {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .cancel-button {
+    background-color: #dc3545;
+    color: white;
+    margin-left: 10px;
+  }
+  
+  .save-button:hover {
+    background-color: #218838;
+  }
+  
+  .cancel-button:hover {
+    background-color: #c82333;
+  }
+  
+  /* Flexbox for buttons to space them out */
+  .modal-content form div.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
