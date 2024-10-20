@@ -28,48 +28,69 @@ class LiveStockChart extends Component {
       showModal: false, 
       alertType: 'above',
       alertPrice: '',
-      socket : io('http://localhost:5000/',{autoConnect:false})
+      jobId:null,
     };
+    this.socket = io('http://localhost:5000/',{autoConnect:false})
+  }
+
+  stockUpdate = (data) => {
+    console.log("RECIEVED ");
+    
+    const { price, timestamp } = data;
+
+    // Append new data to the arrays
+    this.setState((prevState) => ({
+      stockData: [...prevState.stockData, price],
+      timestamps: [...prevState.timestamps, timestamp],
+    }));
+  }
+
+  subscription = (data)=>{
+    this.setState(data)
+  }
+
+  disconnect = () =>{
+    this.socket.off('stock_update');
+    if(this.state.jobId){
+      this.socket.emit('unsubscribe',{"jobId":this.state.jobId})
+    }
+  }
+  onConnect = () =>{
+    this.socket.on('stock_update', this.stockUpdate);
+    this.socket.on('successful_subscription', this.subscription)
+    this.socket.emit('subscribe_to_stock', { stock_symbol: this.props.params.symbol, start_timestamp: this.state.timestamps.at(-1) });
+    
   }
 
   async componentDidMount() {
     const { symbol } = this.props.params; // Get the stock symbol from the URL params
 
+    let market_open, stock_history
+
     const response = await axios.get(`http://localhost:5000/api/stock/${symbol}`, {
       headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` },
     });
 
-    const stock_history = response.data.price_history;
-    const market_open = response.data.market_open;
+    stock_history = response.data.price_history;
+    market_open = response.data.market_open;
 
 
     this.setState((prevState) => ({
       stockData: [...prevState.stockData, ...Object.values(stock_history)],
       timestamps: [...prevState.timestamps, ...Object.keys(stock_history)],
     }));
+    
 
     // Only connect and subscribe if market is open
     if (market_open) {
-      this.state.socket.connect();
-      // Listen for stock data updates
-      this.state.socket.on('stock_update', (data) => {
-        const { price, timestamp } = data;
-
-        // Append new data to the arrays
-        this.setState((prevState) => ({
-          stockData: [...prevState.stockData, price],
-          timestamps: [...prevState.timestamps, timestamp],
-        }));
-      });
-
-      // Subscribe to stock symbol when component mounts
-      this.state.socket.emit('subscribe_to_stock', { stock_symbol: symbol, start_timestamp: this.state.timestamps.at(-1) });
+      this.socket.connect();
+      this.socket.on("connect",this.onConnect)
     }
   }
 
   componentWillUnmount() {
-      this.state.socket.off('stock_update');
-      this.state.socket.disconnect();
+    this.disconnect()
+    this.socket.disconnect();
   }
 
   toggleModal = () => {

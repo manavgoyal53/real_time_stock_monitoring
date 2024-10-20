@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch(thread=True, time=True)
+
 from flask import Flask
 from config import Config
 from extensions import db, migrate, cache, mail, jwt, cors, socketio

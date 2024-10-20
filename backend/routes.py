@@ -13,6 +13,7 @@ from config import Config
 stock_blueprint = Blueprint('stock', __name__)
 auth_blueprint = Blueprint('auth', __name__)
 scheduler = BackgroundScheduler()
+scheduler.start()
 
 jwt_redis_blocklist = redis.StrictRedis(
     host=Config.JWT_BLOCKLIST_SERVER, port=6379, db=2, decode_responses=True
@@ -35,7 +36,7 @@ def register():
     db.session.commit()
     user = User.query.filter_by(email=email).first()
     access_token = create_access_token(identity=user.id,expires_delta=ACCESS_EXPIRY)
-    return jsonify(access_token=access_token,id=user.id), 200
+    return jsonify(access_token=access_token), 200
     
 
 @auth_blueprint.route('/login', methods=['POST'])
@@ -50,7 +51,7 @@ def login():
         return jsonify({"msg": "Invalid username or password"}), 401
 
     access_token = create_access_token(identity=user.id,expires_delta=ACCESS_EXPIRY)
-    return jsonify(access_token=access_token,id=user.id), 200
+    return jsonify(access_token=access_token), 200
 
 @jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
@@ -165,6 +166,12 @@ def handle_disconnect():
 @socketio.on('subscribe_to_stock')
 def handle_stock_subscription(data):
     stock_symbol = data['stock_symbol']
-    scheduler.add_job(send_stock_data, 'interval', seconds=60, args=[stock_symbol])
+    job = scheduler.add_job(send_stock_data, 'interval', seconds=60, args=[stock_symbol])
+    scheduler.resume()
+    socketio.emit("successful_subscription",{"jobId":job.id})
 
-
+@socketio.on('unsubscribe')
+def handle_unsubscription(data):
+    job_id = data['jobId']
+    scheduler.remove_job(job_id)
+    scheduler.pause()
