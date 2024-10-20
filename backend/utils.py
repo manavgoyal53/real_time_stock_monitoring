@@ -72,6 +72,6 @@ def send_stock_data(stock_symbol):
     new_data.update(json.loads(data["Close"].to_json(date_format="iso")))
     cache.set(f"stock_{stock_symbol}",new_data,timeout=60*60*24)
     if not data.empty:
-        price = data['Close'][-1]
-        timestamp = price.index[-1].isoformat()
+        timestamp = data.index[-1].isoformat()
+        price = data['Close'].tail(1).item()
         socketio.emit('stock_update', {'timestamp': timestamp, 'price': price})
