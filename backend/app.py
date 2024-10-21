@@ -1,5 +1,5 @@
 import eventlet
-eventlet.monkey_patch(thread=True, time=True)
+eventlet.monkey_patch(thread=True, time=True) #For running the APScheduler tasks and socketio connection on the same thread
 
 from flask import Flask
 from config import Config

@@ -5,6 +5,13 @@ from flask_mail import Message
 import datetime
 
 def get_stock_price(symbol):
+    """
+    Takes in the stock symbol and gives you the latest
+    available day change in the price of that stock.
+    First this logic would check for weekend days. Then
+    for the market open close times and then for the active
+    hours.
+    """
     stock = yf.Ticker(symbol)
     now = datetime.datetime.now()
     date = now.date()
@@ -53,7 +60,8 @@ def get_stock_price(symbol):
 
 def send_email_alert(user_email, stock_symbol, stock_price, threshold, alert_type):
     """
-    Sends an email notification to the user.
+    Sends an email notification to the user when
+    the price hits the specified threshold.
     """
     subject = f"Stock Alert: {stock_symbol}"
     body = f"The stock {stock_symbol} has reached your {alert_type} threshold of {threshold}. Current price: {stock_price}"
@@ -64,6 +72,10 @@ def send_email_alert(user_email, stock_symbol, stock_price, threshold, alert_typ
 
 
 def send_stock_data(stock_symbol):
+    """
+    This function runs for every minutes and emits 
+    the data to the subscribed user using SocketIO.
+    """
     stock = yf.Ticker(stock_symbol)
     data = stock.history(interval="1m",start=datetime.datetime.utcnow()-datetime.timedelta(minutes=1))
     new_data = {}

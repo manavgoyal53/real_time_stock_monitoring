@@ -53,8 +53,14 @@ def login():
     access_token = create_access_token(identity=user.id,expires_delta=ACCESS_EXPIRY)
     return jsonify(access_token=access_token), 200
 
+
+
 @jwt.token_in_blocklist_loader
 def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
+    """
+    Used for checking the token validity in the 
+    blocked list of tokens.
+    """
     jti = jwt_payload["jti"]
     token_in_redis = jwt_redis_blocklist.get(jti)
     return token_in_redis is not None
@@ -74,6 +80,9 @@ def logout():
 @stock_blueprint.route('/alerts', methods=['POST','GET'])
 @jwt_required()
 def alerts():
+    """
+    Used to fetch the list of alerts or create a new one
+    """
     if request.method == "POST":
         data = request.get_json()
         user_id = get_jwt_identity()
@@ -112,6 +121,10 @@ def alerts():
 @stock_blueprint.route('/alerts/<int:alert_id>', methods=['PUT'])
 @jwt_required()
 def enable_disable(alert_id):
+    """
+    Endpoint for enabling/disabling an alert for
+    a particular stock
+    """
     data = request.get_json()
     enabled = data.get("enabled")
     alert = Alert.query.get(alert_id)
@@ -121,6 +134,7 @@ def enable_disable(alert_id):
     db.session.commit()
     
     return jsonify({"message": "Alert updated successfully"}), 200
+
 
 
 
@@ -138,12 +152,14 @@ def get_stock_details(symbol):
     else:
         return jsonify({"error": "Unable to fetch stock data"}), 404
 
+
+
 @stock_blueprint.route('/', methods=['GET'])
 @jwt_required()
 def homepage():
     """
     Fetches the stock symbols to be displayed on the homepage. Currerntly using
-    two indices but we can add as many as available on a requirement basis
+    a single index but could be added as many as available on a requirement basis
     """
     cached_data = cache.get("stocks_list")
     if cached_data:
