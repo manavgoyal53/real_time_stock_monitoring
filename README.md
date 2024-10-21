@@ -21,6 +21,7 @@ docker-compose up --build
 
 This command will build the necessary Docker images and start the application, along with the required Redis service, if defined in your `docker-compose.yml` file.
 
+After running the containers visit `http://localhost:3000` to test the functionality via UI.
 ### Shutting Down the Containers
 
 Once you're done, you can stop and remove the running containers with the below command.
@@ -34,6 +35,18 @@ Remember this will also remove any persisting volumes and hence any db data. So 
 ```bash
 docker-compose down
 ```
+
+
+
+### Change the Mail credentials
+
+In the `.env` file inside `backend/` folder update the credentials you would like to use to send the notification mails with. The following variables need to be updated if you are sending the mail using Gmail.
+
+ - `MAIL_USERNAME`
+ - `MAIL_PASSWORD`
+
+
+
 
 
 ## Part 2: Code Overview
