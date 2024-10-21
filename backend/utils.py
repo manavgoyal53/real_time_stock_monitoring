@@ -3,6 +3,7 @@ import json
 from extensions import cache,mail,socketio
 from flask_mail import Message
 import datetime
+from dateutil import tz
 
 def get_stock_price(symbol):
     """
@@ -13,11 +14,12 @@ def get_stock_price(symbol):
     hours.
     """
     stock = yf.Ticker(symbol)
-    now = datetime.datetime.now()
+    tzlocal = tz.gettz("Asia/Kolkata")
+    now = datetime.datetime.now().astimezone(tzlocal)
     date = now.date()
     weekday = date.isoweekday()
-    open_time = datetime.datetime(day = date.day,month=date.month,year=date.year,hour=9,minute=15)
-    close_time = datetime.datetime(day = date.day,month=date.month,year=date.year,hour=15,minute=30)
+    open_time = datetime.datetime(day = date.day,month=date.month,year=date.year,hour=9,minute=15,tzinfo=tzlocal)
+    close_time = datetime.datetime(day = date.day,month=date.month,year=date.year,hour=15,minute=30,tzinfo=tzlocal)
     market_close = (now > close_time and now > open_time) or (now < close_time and now < open_time)
     cached_data = cache.get(f"stock_{symbol}")
 

@@ -11,10 +11,10 @@ from extensions import cache
 
 app = create_app()
 
-celery = Celery(app.import_name, broker='redis://redis:6379/1',beat_schedule = {
+celery = Celery(app.import_name, broker='redis://redis:6379/1',timezone="Asia/Kolkata",enable_utc=False,beat_schedule = {
     'fetch_stock_data_every_minute': {
         'task': 'celery_worker.check_alerts',
-        'schedule': crontab(hour="9-16",day_of_week="mon-fri"),
+        'schedule': crontab(hour="9-16",day_of_week="mon-fri",minute="*"),
     },
     'clear_price_cache': {
         'task': 'celery_worker.clear_cache',
