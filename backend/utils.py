@@ -80,12 +80,15 @@ def send_stock_data(stock_symbol):
     """
     stock = yf.Ticker(stock_symbol)
     data = stock.history(interval="1m",start=datetime.datetime.utcnow()-datetime.timedelta(minutes=1))
-    new_data = {}
-    cached_data = cache.get(f"stock_{stock_symbol}")
-    new_data.update(cached_data)
-    new_data.update(json.loads(data["Close"].to_json(date_format="iso")))
-    cache.set(f"stock_{stock_symbol}",new_data,timeout=60*60*24)
     if not data.empty:
+        cached_data = cache.get(f"stock_{stock_symbol}")
         timestamp = data.index[-1].isoformat()
+        if timestamp in cached_data:
+            return
+        
         price = data['Close'].tail(1).item()
+        new_data = {}    
+        new_data.update(cached_data)
+        new_data.update(json.loads(data["Close"].to_json(date_format="iso")))
+        cache.set(f"stock_{stock_symbol}",new_data,timeout=60*60*24)
         socketio.emit('stock_update', {'timestamp': timestamp, 'price': price})
