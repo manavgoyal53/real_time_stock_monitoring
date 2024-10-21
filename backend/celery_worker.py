@@ -35,11 +35,12 @@ def check_alerts():
             user = User.query.get(alert.user_id)
             ticker = yfinance.Ticker(alert.stock_symbol)
             price = ticker.history(start=datetime.datetime.utcnow()-datetime.timedelta(minutes=1),period="1m")
-            current_price = price['Close'][-1]
-            if alert.alert_type == "above" and current_price > alert.price_threshold:
-                send_email_alert(user.email, alert.stock_symbol, current_price, alert.price_threshold)
-            elif alert.alert_type == "below" and current_price < alert.price_threshold:
-                send_email_alert(user.email, alert.stock_symbol, current_price, alert.price_threshold)
+            current_price = price['Close'].tail(1).item()
+            if current_price is not None:
+                if alert.alert_type == "above" and current_price > alert.price_threshold:
+                    send_email_alert(user.email, alert.stock_symbol, current_price, alert.price_threshold,alert.alert_type)
+                elif alert.alert_type == "below" and current_price < alert.price_threshold:
+                    send_email_alert(user.email, alert.stock_symbol, current_price, alert.price_threshold,alert.alert_type)
 
 
 @celery.task
